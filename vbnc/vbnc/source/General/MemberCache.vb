@@ -57,7 +57,9 @@ Public Class MemberCache
     Private m_Types As List(Of Mono.Cecil.TypeReference)
     Private m_Members As List(Of Mono.Collections.Generic.Collection(Of MemberReference))
     Private m_Bases As List(Of MemberCache)
-    Private m_LoadedNames(MemberVisibility.All) As System.Collections.Generic.HashSet(Of String)
+    ' Bootstrap against Mono 1.2.6, which predates HashSet(Of T).
+    ' Dictionary(Of String, Boolean) preserves the name-set semantics we need.
+    Private m_LoadedNames(MemberVisibility.All) As System.Collections.Generic.Dictionary(Of String, Boolean)
     Private m_LoadedAll(MemberVisibility.All) As Boolean
 
     Sub New(ByVal Compiler As Compiler, ByVal Type As Mono.Cecil.TypeReference)
@@ -165,14 +167,14 @@ Public Class MemberCache
         If m_LoadedAll(Visibility) Then
             Return
         ElseIf m_LoadedNames(Visibility) Is Nothing Then
-            m_LoadedNames(Visibility) = New HashSet(Of String)(Helper.StringComparer)
-        ElseIf Name IsNot Nothing AndAlso m_LoadedNames(Visibility).Contains(Name) Then
+            m_LoadedNames(Visibility) = New Dictionary(Of String, Boolean)(Helper.StringComparer)
+        ElseIf Name IsNot Nothing AndAlso m_LoadedNames(Visibility).ContainsKey(Name) Then
             Return
         End If
 
         If Name Is Nothing Then Clear(Visibility)
 
-        If Name IsNot Nothing Then m_LoadedNames(Visibility).Add(Name)
+        If Name IsNot Nothing Then m_LoadedNames(Visibility)(Name) = True
 
         For i As Integer = 0 To m_Types.Count - 1
             Load(m_Types(i), m_Members(i), Name, Visibility)
@@ -437,9 +439,9 @@ Public Class MemberCache
                     Dim isOverrides As Boolean
 
                     methodAttributes = Helper.GetMethodAttributes(thisMember)
-                    isHideBySig = CBool(methodAttributes And Reflection.MethodAttributes.HideBySig)
-                    isVirtual = CBool(methodAttributes And Reflection.MethodAttributes.Virtual)
-                    isNewSlot = CBool(methodAttributes And Reflection.MethodAttributes.NewSlot)
+                    isHideBySig = CBool(methodAttributes And Mono.Cecil.MethodAttributes.HideBySig)
+                    isVirtual = CBool(methodAttributes And Mono.Cecil.MethodAttributes.Virtual)
+                    isNewSlot = CBool(methodAttributes And Mono.Cecil.MethodAttributes.NewSlot)
                     isOverrides = isVirtual AndAlso isNewSlot = False
                     If isHideBySig = False AndAlso isOverrides = False Then
                         Return True

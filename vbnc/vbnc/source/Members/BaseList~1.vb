@@ -80,7 +80,10 @@ Public Class BaseList(Of T As ParsedObject)
         MyBase.new(Parent)
     End Sub
 
-    Sub New(ByVal Parent As ParsedObject, ByVal ParamArray Objects() As T)
+    ' Bootstrap bmcs still rejects the generic array spelling `Objects() As T`
+    ' here. Every current caller already passes an array, so accept the values
+    ' as IEnumerable(Of T) and keep the underlying AddRange semantics unchanged.
+    Sub New(ByVal Parent As ParsedObject, ByVal Objects As Generic.IEnumerable(Of T))
         MyBase.new(Parent)
         m_List.AddRange(Objects)
     End Sub

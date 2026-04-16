@@ -49,6 +49,9 @@ Namespace Microsoft.VisualBasic.FileIO
 
             ' This call is required by the Windows Form Designer.
             InitializeComponent()
+            ' Use explicit .NET event hookup so the bootstrap does not need
+            ' WithEvents/Handles support in bmcs for these internal UI forms.
+            AddHandler cmdCancel.Click, New System.EventHandler(AddressOf cmdCancel_Click)
 
             ' Add any initialization after the InitializeComponent() call.
             m_Operation = Operation
@@ -94,7 +97,7 @@ Namespace Microsoft.VisualBasic.FileIO
             System.Windows.Forms.Application.DoEvents()
         End Sub
 
-        Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
+        Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
             m_Operation.Cancel()
         End Sub
 
@@ -197,11 +200,11 @@ Namespace Microsoft.VisualBasic.FileIO
             Me.ResumeLayout(False)
 
         End Sub
-        Friend WithEvents barProgress As System.Windows.Forms.ProgressBar
-        Friend WithEvents cmdCancel As System.Windows.Forms.Button
-        Friend WithEvents lblFile As System.Windows.Forms.Label
-        Friend WithEvents lblDirs As System.Windows.Forms.Label
-        Friend WithEvents lblTimeLeft As System.Windows.Forms.Label
+        Friend barProgress As System.Windows.Forms.ProgressBar
+        Friend cmdCancel As System.Windows.Forms.Button
+        Friend lblFile As System.Windows.Forms.Label
+        Friend lblDirs As System.Windows.Forms.Label
+        Friend lblTimeLeft As System.Windows.Forms.Label
 #End Region
 
     End Class

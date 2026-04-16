@@ -32,6 +32,10 @@ Public Class Helper
     Public Shared StringComparison As StringComparison = StringComparison.OrdinalIgnoreCase
 
     Private Shared m_SharedCompilers As New Generic.List(Of Compiler)
+    ' Bootstrap bmcs does not support Static locals. Keep GetSequenceNumber's
+    ' original process-wide monotonically increasing counter as an explicit
+    ' Shared field instead of changing the function's lifetime semantics.
+    Private Shared m_GetSequenceNumber_number As Integer
 
     Public Shared LOGMETHODRESOLUTION As Boolean = False
 
@@ -2462,9 +2466,8 @@ Public Class Helper
     ''' <returns></returns>
     ''' <remarks></remarks>
     Shared Function GetSequenceNumber() As Integer
-        Static number As Integer
-        number += 1
-        Return number
+        m_GetSequenceNumber_number += 1
+        Return m_GetSequenceNumber_number
     End Function
 
     ''' <summary>

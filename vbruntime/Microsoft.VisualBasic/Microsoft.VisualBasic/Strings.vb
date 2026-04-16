@@ -1087,11 +1087,12 @@ Namespace Microsoft.VisualBasic
         End Function
 
         Friend Shared Function String_Compare(ByVal strA As String, ByVal strB As String, ByVal ignoreCase As Boolean) As Integer
-            Return String.Compare(strA, strB, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase)
+            ' The old bootstrap mscorlib only has the bool+CultureInfo overload here.
+            Return String.Compare(strA, strB, ignoreCase, CultureInfo.CurrentCulture)
         End Function
 
         Friend Shared Function String_Compare(ByVal strA As String, ByVal indexA As Integer, ByVal strB As String, ByVal indexB As Integer, ByVal length As Integer, ByVal ignoreCase As Boolean) As Integer
-            Return String.Compare(strA, indexA, strB, indexB, length, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase)
+            Return String.Compare(strA, indexA, strB, indexB, length, ignoreCase, CultureInfo.CurrentCulture)
         End Function
 
         Public Shared Function StrComp(ByVal String1 As String, ByVal String2 As String, _

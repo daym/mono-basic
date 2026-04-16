@@ -1171,7 +1171,7 @@ Public Class CecilHelper
         Return (td.IsInterface OrElse td.IsClass) AndAlso td.IsValueType = False
     End Function
 
-    Public Shared Function GetGenericParameterAttributes(ByVal Type As TypeReference) As GenericParameterAttributes
+    Public Shared Function GetGenericParameterAttributes(ByVal Type As TypeReference) As Mono.Cecil.GenericParameterAttributes
         Dim gt As Mono.Cecil.GenericParameter
 
         gt = DirectCast(Type, Mono.Cecil.GenericParameter)
@@ -1427,4 +1427,3 @@ Public Class CecilHelper
         Return Helper.CompareNameOrdinal(a.FullName, b.FullName)
     End Function
 End Class
-

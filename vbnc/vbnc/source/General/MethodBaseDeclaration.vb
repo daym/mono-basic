@@ -126,7 +126,7 @@ Public MustInherit Class MethodBaseDeclaration
                 Dim sec As Mono.Cecil.SecurityDeclaration
                 Dim secAtt As Mono.Cecil.SecurityAttribute
                 Dim attribInstantiation As Object = Nothing
-                Dim attribInstance As SecurityAttribute
+                Dim attribInstance As System.Security.Permissions.SecurityAttribute
                 Dim attribAction As Mono.Cecil.SecurityAction
                 Dim attribPermissionSetAttribute As PermissionSetAttribute
 
@@ -136,7 +136,7 @@ Public MustInherit Class MethodBaseDeclaration
                     Continue For
                 End If
 
-                attribInstance = TryCast(attribInstantiation, SecurityAttribute)
+                attribInstance = TryCast(attribInstantiation, System.Security.Permissions.SecurityAttribute)
                 If attribInstance Is Nothing Then
                     Compiler.Report.ShowMessage(Messages.VBNC30128, attrib.Location, "Security attribute does not inherit from System.Security.Permissions.SecurityAttribute")
                     result = False

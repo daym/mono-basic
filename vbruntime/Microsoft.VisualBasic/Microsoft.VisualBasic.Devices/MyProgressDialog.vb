@@ -33,23 +33,39 @@ Namespace Microsoft.VisualBasic.Devices
     Friend Class MyProgressDialog
         Inherits System.Windows.Forms.Form
 
-        Private WithEvents m_Client As Net.WebClient
+        ' Keep the runtime behavior with normal .NET event hookup so the
+        ' batch bootstrap does not need bmcs to implement WithEvents/Handles.
+        Private m_Client As Net.WebClient
 
         Sub New(ByVal Client As Net.WebClient, ByVal Status As String)
+            InitializeComponent()
             m_Client = Client
+            AddHandler m_Client.DownloadFileCompleted, New System.ComponentModel.AsyncCompletedEventHandler(AddressOf m_Client_DownloadFileCompleted)
+            AddHandler m_Client.DownloadProgressChanged, New System.Net.DownloadProgressChangedEventHandler(AddressOf m_Client_DownloadProgressChanged)
+            AddHandler m_Client.UploadFileCompleted, New System.Net.UploadFileCompletedEventHandler(AddressOf m_Client_UploadFileCompleted)
+            AddHandler m_Client.UploadProgressChanged, New System.Net.UploadProgressChangedEventHandler(AddressOf m_Client_UploadProgressChanged)
+            AddHandler cmdCancel.Click, New System.EventHandler(AddressOf cmdCancel_Click)
             lblStatus.Text = Status
         End Sub
 
         Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-            If disposing AndAlso components IsNot Nothing Then
-                components.Dispose()
+            If disposing Then
+                If m_Client IsNot Nothing Then
+                    RemoveHandler m_Client.DownloadFileCompleted, New System.ComponentModel.AsyncCompletedEventHandler(AddressOf m_Client_DownloadFileCompleted)
+                    RemoveHandler m_Client.DownloadProgressChanged, New System.Net.DownloadProgressChangedEventHandler(AddressOf m_Client_DownloadProgressChanged)
+                    RemoveHandler m_Client.UploadFileCompleted, New System.Net.UploadFileCompletedEventHandler(AddressOf m_Client_UploadFileCompleted)
+                    RemoveHandler m_Client.UploadProgressChanged, New System.Net.UploadProgressChangedEventHandler(AddressOf m_Client_UploadProgressChanged)
+                End If
+                If components IsNot Nothing Then
+                    components.Dispose()
+                End If
             End If
             MyBase.Dispose(disposing)
         End Sub
 
-        Friend WithEvents cmdCancel As System.Windows.Forms.Button
-        Friend WithEvents barProgress As System.Windows.Forms.ProgressBar
-        Friend WithEvents lblStatus As System.Windows.Forms.Label
+        Friend cmdCancel As System.Windows.Forms.Button
+        Friend barProgress As System.Windows.Forms.ProgressBar
+        Friend lblStatus As System.Windows.Forms.Label
 
         Private components As System.ComponentModel.IContainer
 
@@ -110,27 +126,27 @@ Namespace Microsoft.VisualBasic.Devices
 
         End Sub
 
-        Private Sub m_Client_DownloadFileCompleted(ByVal sender As Object, ByVal e As System.ComponentModel.AsyncCompletedEventArgs) Handles m_Client.DownloadFileCompleted
+        Private Sub m_Client_DownloadFileCompleted(ByVal sender As Object, ByVal e As System.ComponentModel.AsyncCompletedEventArgs)
             barProgress.Value = 100
             Me.DialogResult = Windows.Forms.DialogResult.OK
             Close()
         End Sub
 
-        Private Sub m_Client_DownloadProgressChanged(ByVal sender As Object, ByVal e As System.Net.DownloadProgressChangedEventArgs) Handles m_Client.DownloadProgressChanged
+        Private Sub m_Client_DownloadProgressChanged(ByVal sender As Object, ByVal e As System.Net.DownloadProgressChangedEventArgs)
             barProgress.Value = e.ProgressPercentage
         End Sub
 
-        Private Sub m_Client_UploadFileCompleted(ByVal sender As Object, ByVal e As System.Net.UploadFileCompletedEventArgs) Handles m_Client.UploadFileCompleted
+        Private Sub m_Client_UploadFileCompleted(ByVal sender As Object, ByVal e As System.Net.UploadFileCompletedEventArgs)
             barProgress.Value = 100
             Me.DialogResult = Windows.Forms.DialogResult.OK
             Close()
         End Sub
 
-        Private Sub m_Client_UploadProgressChanged(ByVal sender As Object, ByVal e As System.Net.UploadProgressChangedEventArgs) Handles m_Client.UploadProgressChanged
+        Private Sub m_Client_UploadProgressChanged(ByVal sender As Object, ByVal e As System.Net.UploadProgressChangedEventArgs)
             barProgress.Value = e.ProgressPercentage
         End Sub
 
-        Private Sub cmdCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
+        Private Sub cmdCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs)
             m_Client.CancelAsync()
             Me.DialogResult = Windows.Forms.DialogResult.Cancel
             Close()

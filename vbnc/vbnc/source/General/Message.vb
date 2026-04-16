@@ -79,7 +79,7 @@ Public Class Message
 
         If Compiler.CommandLine.WarnAsError.HasValue AndAlso Compiler.CommandLine.WarnAsError.Value Then
             Return True
-        ElseIf Compiler.CommandLine.WarningsAsError IsNot Nothing AndAlso Compiler.CommandLine.WarningsAsError.Contains(CInt(m_Message(0))) Then
+        ElseIf Compiler.CommandLine.WarningsAsError IsNot Nothing AndAlso Compiler.CommandLine.WarningsAsError.ContainsKey(CInt(m_Message(0))) Then
             Return True
         Else
             Return False
@@ -95,7 +95,7 @@ Public Class Message
 
         If Compiler.CommandLine.NoWarnings Is Nothing Then Return False
 
-        Return Compiler.CommandLine.NoWarnings.Contains((CInt(m_Message(0))))
+        Return Compiler.CommandLine.NoWarnings.ContainsKey((CInt(m_Message(0))))
     End Function
 
     ''' <summary>

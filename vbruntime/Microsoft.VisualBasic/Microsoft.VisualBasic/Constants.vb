@@ -33,7 +33,7 @@ Imports Microsoft.VisualBasic.CompilerServices
 Namespace Microsoft.VisualBasic
     <StandardModule()> _
     Public NotInheritable Class Constants
-        Public Const vbCrLf As String = ControlChars.Cr + ControlChars.Lf
+        Public Const vbCrLf As String = ControlChars.Cr & ControlChars.Lf
         Public Const vbNewLine As String = vbCrLf
         Public Const vbCr As String = ControlChars.Cr
         Public Const vbLf As String = ControlChars.Lf

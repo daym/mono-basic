@@ -41,6 +41,11 @@ Public Class Scanner
     Private Const COMMENTCHAR2 As Char = Microsoft.VisualBasic.ChrW(&H2018)
     Private Const COMMENTCHAR3 As Char = Microsoft.VisualBasic.ChrW(&H2019)
 
+    ' Bootstrap bmcs does not support Static locals. Keep GetNumber's
+    ' reusable scratch StringBuilder as an explicit Shared field so
+    ' repeated numeric token parsing still reuses one buffer.
+    Private Shared ReadOnly m_NumberBuilder As New Text.StringBuilder
+
     ''' <summary>
     ''' The total number of lines scanned.
     ''' </summary>
@@ -939,7 +944,7 @@ Public Class Scanner
         Dim Base As IntegerBase
         Dim bReal As Boolean
         Dim bE As Boolean
-        Static Builder As New Text.StringBuilder
+        Dim Builder As Text.StringBuilder = m_NumberBuilder
         Builder.Length = 0
 
         'First find the type of the number

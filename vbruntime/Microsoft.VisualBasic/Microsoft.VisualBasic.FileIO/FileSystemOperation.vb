@@ -49,6 +49,10 @@ Namespace Microsoft.VisualBasic.FileIO
         Private m_TotalSize As Long
         Private m_Cancelled As Boolean
         Private m_Errors As New Generic.Dictionary(Of String, String)
+        ' Preserve the old Static-local semantics without requiring bmcs to
+        ' implement Static locals for the bootstrap runtime build.
+        Private Shared m_OverwriteAllChoice As Boolean
+        Private Shared m_OverwriteNoneChoice As Boolean
 
         Private Class Info
             Public Name As String
@@ -489,11 +493,8 @@ Namespace Microsoft.VisualBasic.FileIO
 
         Private Function DoOverwrite(ByVal Source As String, ByVal Destination As String) As Boolean
             If m_ShowUI Then
-                Static overWriteAll As Boolean
-                Static overWriteNone As Boolean
-
-                If overWriteAll Then Return True
-                If overWriteNone Then Return False
+                If m_OverwriteAllChoice Then Return True
+                If m_OverwriteNoneChoice Then Return False
 
                 If m_ShowUIOption = UIOption.OnlyErrorDialogs Then Return True
 #If TARGET_JVM = False Then 'Windows.Forms Not Supported by Grasshopper
@@ -522,12 +523,12 @@ Namespace Microsoft.VisualBasic.FileIO
                         Case FileSystemOperationUIQuestion.Answer.No
                             Return False
                         Case FileSystemOperationUIQuestion.Answer.NoToAll
-                            overWriteNone = True
+                            m_OverwriteNoneChoice = True
                             Return False
                         Case FileSystemOperationUIQuestion.Answer.Yes
                             Return True
                         Case FileSystemOperationUIQuestion.Answer.YesToAll
-                            overWriteAll = True
+                            m_OverwriteAllChoice = True
                             Return True
                         Case Else
                             Return False

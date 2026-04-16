@@ -593,7 +593,12 @@ Public Class TypeNameResolutionInfo
                 If typeInCurrentModule IsNot Nothing Then typesInAllModules.Add(typeInCurrentModule)
             Next
             If typesInAllModules.Count = 1 Then
-                m_FoundObjects.AddRange(typesInAllModules.ToArray)
+                ' Mono 1.2.6 does not support the newer generic-covariant
+                ' IEnumerable(Of Derived) -> IEnumerable(Of Base) AddRange shape.
+                ' Add the found TypeReference objects explicitly instead.
+                For Each foundTypeInModule As Mono.Cecil.TypeReference In typesInAllModules
+                    m_FoundObjects.Add(foundTypeInModule)
+                Next
                 Return True
             ElseIf typesInAllModules.Count > 1 Then
                 '** If R matches the name of accessible nested types in more than one standard module, a compile-time 

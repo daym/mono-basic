@@ -56,7 +56,10 @@ namespace Mono.Cecil {
 				if (metadata.Types == null)
 					Initialize (module.Types);
 
-				return module.Read (new Row<string, string> (@namespace, name), (row, reader) => {
+				// Mono 2.4 gmcs cannot infer TRet here from the block lambda's
+				// TypeDefinition/null returns, so spell out the intended
+				// TypeReference result explicitly.
+				return module.Read<Row<string, string>, TypeReference> (new Row<string, string> (@namespace, name), (row, reader) => {
 					var types = reader.metadata.Types;
 
 					for (int i = 0; i < types.Length; i++) {

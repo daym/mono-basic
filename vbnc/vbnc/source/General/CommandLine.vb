@@ -17,7 +17,6 @@
 ' Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ' 
 
-Imports Microsoft.VisualBasic.Strings
 Imports Microsoft.VisualBasic
 
 '        Visual Basic .NET Compiler Options
@@ -228,7 +227,9 @@ Public Class CommandLine
     ''' /nowarn:&lt;number_list&gt;   Disable a list of individual warnings.
     ''' </summary>
     Private m_bNoWarn As Boolean
-    Private m_NoWarnings As Generic.HashSet(Of Integer)
+    ' Bootstrap against Mono 1.2.6, which predates HashSet(Of T).
+    ' Dictionary(Of Integer, Boolean) preserves the set semantics we need.
+    Private m_NoWarnings As Generic.Dictionary(Of Integer, Boolean)
 
     ''' <summary>
     ''' /warnaserror[+|-]       Treat warnings as errors.
@@ -238,7 +239,9 @@ Public Class CommandLine
     ''' <summary>
     ''' /warnaserror:list       Treat the specified warnings as errors.
     ''' </summary>
-    Private m_WarningsAsError As Generic.HashSet(Of Integer)
+    ' Bootstrap against Mono 1.2.6, which predates HashSet(Of T).
+    ' Dictionary(Of Integer, Boolean) preserves the set semantics we need.
+    Private m_WarningsAsError As Generic.Dictionary(Of Integer, Boolean)
 
     ' - LANGUAGE -
 
@@ -523,7 +526,7 @@ Public Class CommandLine
     ''' <summary>
     ''' /nowarn:&lt;number_list&gt;  Disable a list of individual warnings.
     ''' </summary>
-    ReadOnly Property NoWarnings As Generic.HashSet(Of Integer)
+    ReadOnly Property NoWarnings As Generic.Dictionary(Of Integer, Boolean)
         Get
             Return m_NoWarnings
         End Get
@@ -532,7 +535,7 @@ Public Class CommandLine
     ''' <summary>
     ''' /warnaserror:list       Treat the specified warnings as errors.
     ''' </summary>
-    ReadOnly Property WarningsAsError As Generic.HashSet(Of Integer)
+    ReadOnly Property WarningsAsError As Generic.Dictionary(Of Integer, Boolean)
         Get
             Return m_WarningsAsError
         End Get
@@ -1030,8 +1033,8 @@ Public Class CommandLine
                     For Each number As String In strValue.Split(New Char() {","c}, StringSplitOptions.RemoveEmptyEntries)
                         Dim n As Integer
                         If Integer.TryParse(number, Globalization.NumberStyles.AllowLeadingWhite Or Globalization.NumberStyles.AllowTrailingWhite, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, n) Then
-                            If m_NoWarnings Is Nothing Then m_NoWarnings = New Generic.HashSet(Of Integer)
-                            m_NoWarnings.Add(n)
+                            If m_NoWarnings Is Nothing Then m_NoWarnings = New Generic.Dictionary(Of Integer, Boolean)
+                            m_NoWarnings(n) = True
                         Else
                             Compiler.Report.SaveMessage(Messages.VBNC2014, Span.CommandLineSpan, number, "nowarn")
                         End If
@@ -1043,8 +1046,8 @@ Public Class CommandLine
                     For Each number As String In strValue.Split(New Char() {","c}, StringSplitOptions.RemoveEmptyEntries)
                         Dim n As Integer
                         If Integer.TryParse(number, Globalization.NumberStyles.AllowLeadingWhite Or Globalization.NumberStyles.AllowTrailingWhite, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, n) Then
-                            If m_WarningsAsError Is Nothing Then m_WarningsAsError = New Generic.HashSet(Of Integer)
-                            m_WarningsAsError.Add(n)
+                            If m_WarningsAsError Is Nothing Then m_WarningsAsError = New Generic.Dictionary(Of Integer, Boolean)
+                            m_WarningsAsError(n) = True
                         Else
                             Compiler.Report.SaveMessage(Messages.VBNC2014, Span.CommandLineSpan, number, "warnaserror")
                         End If
@@ -1350,4 +1353,3 @@ Partial Public Class CommandLine
         V8
     End Enum
 End Class
-

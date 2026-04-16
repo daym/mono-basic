@@ -39,6 +39,12 @@ Namespace Microsoft.VisualBasic.FileIO
 
         Sub New()
             InitializeComponent()
+            ' Use explicit .NET event hookup so the bootstrap does not need
+            ' WithEvents/Handles support in bmcs for these internal UI forms.
+            AddHandler cmdCancel.Click, New System.EventHandler(AddressOf cmdCancel_Click)
+            AddHandler cmdNo.Click, New System.EventHandler(AddressOf cmdNo_Click)
+            AddHandler cmdYesToAll.Click, New System.EventHandler(AddressOf cmdYesToAll_Click)
+            AddHandler cmdYes.Click, New System.EventHandler(AddressOf cmdYes_Click)
         End Sub
 
         Shadows Function ShowDialog() As Answer
@@ -54,12 +60,12 @@ Namespace Microsoft.VisualBasic.FileIO
             Cancel
         End Enum
 
-        Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click
+        Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
             m_Answer = Answer.Cancel
             Close()
         End Sub
 
-        Private Sub cmdNo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNo.Click
+        Private Sub cmdNo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
             If System.Windows.Forms.Control.ModifierKeys = Windows.Forms.Keys.Shift Then
                 m_Answer = Answer.NoToAll
             Else
@@ -68,12 +74,12 @@ Namespace Microsoft.VisualBasic.FileIO
             Close()
         End Sub
 
-        Private Sub cmdYesToAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdYesToAll.Click
+        Private Sub cmdYesToAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
             m_Answer = Answer.YesToAll
             Close()
         End Sub
 
-        Private Sub cmdYes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdYes.Click
+        Private Sub cmdYes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
             m_Answer = Answer.Yes
             Close()
         End Sub
@@ -265,19 +271,19 @@ Namespace Microsoft.VisualBasic.FileIO
             Me.PerformLayout()
 
         End Sub
-        Friend WithEvents lblTitle As System.Windows.Forms.Label
-        Friend WithEvents lblText1 As System.Windows.Forms.Label
-        Friend WithEvents lblText2 As System.Windows.Forms.Label
-        Friend WithEvents lblDateA As System.Windows.Forms.Label
-        Friend WithEvents lblSizeA As System.Windows.Forms.Label
-        Friend WithEvents lblDateB As System.Windows.Forms.Label
-        Friend WithEvents lblSizeB As System.Windows.Forms.Label
-        Friend WithEvents cmdYes As System.Windows.Forms.Button
-        Friend WithEvents cmdYesToAll As System.Windows.Forms.Button
-        Friend WithEvents cmdNo As System.Windows.Forms.Button
-        Friend WithEvents cmdCancel As System.Windows.Forms.Button
-        Friend WithEvents iconA As System.Windows.Forms.PictureBox
-        Friend WithEvents iconB As System.Windows.Forms.PictureBox
+        Friend lblTitle As System.Windows.Forms.Label
+        Friend lblText1 As System.Windows.Forms.Label
+        Friend lblText2 As System.Windows.Forms.Label
+        Friend lblDateA As System.Windows.Forms.Label
+        Friend lblSizeA As System.Windows.Forms.Label
+        Friend lblDateB As System.Windows.Forms.Label
+        Friend lblSizeB As System.Windows.Forms.Label
+        Friend cmdYes As System.Windows.Forms.Button
+        Friend cmdYesToAll As System.Windows.Forms.Button
+        Friend cmdNo As System.Windows.Forms.Button
+        Friend cmdCancel As System.Windows.Forms.Button
+        Friend iconA As System.Windows.Forms.PictureBox
+        Friend iconB As System.Windows.Forms.PictureBox
 #End Region
 
     End Class

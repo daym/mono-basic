@@ -40,10 +40,13 @@ Namespace Microsoft.VisualBasic.OSSpecific
         Shared ReadOnly Property Driver() As OSDriver
             Get
 #If TARGET_JVM = False Then
-		If m_Driver Is Nothing Then
+                If m_Driver Is Nothing Then
                     Select Case CInt(System.Environment.OSVersion.Platform)
                         Case PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE
-                            m_Driver = New Win32Driver()
+                            ' Bootstrap note: Win32Driver is excluded from this
+                            ' non-Windows bootstrap build because it still uses
+                            ' unsupported Declare Auto declarations.
+                            Throw New PlatformNotSupportedException("Windows OSDriver is excluded from this bootstrap build.")
                         Case 128, 4 'PlatformID.Unix = 4
                             m_Driver = New LinuxDriver()
                         Case Else

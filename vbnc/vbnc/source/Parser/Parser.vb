@@ -4846,7 +4846,10 @@ Public Class Parser
 
         result = ParseTypeVariableDeclarators(Parent, m_VariableModifiers, Info)
 
-        tm.AcceptNewLine(GotoNewline:=True, ReportError:=True)
+        ' Bootstrap bmcs does not support named arguments; keep the original
+        ' AcceptNewLine(GotoNewline:=True, ReportError:=True) semantics by
+        ' passing the optional parameters positionally as (True, True, True).
+        tm.AcceptNewLine(True, True, True)
 
         Return result
     End Function
@@ -6704,4 +6707,3 @@ Public Class Parser
         End If
     End Sub
 End Class
-

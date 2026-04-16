@@ -92,7 +92,7 @@ Namespace Microsoft.VisualBasic.CompilerServices
             Return Double.Parse(Value, NumberFormat)
         End Function
 
-        Friend Shared Function TryParse(ByVal value As String, <OutAttribute()> ByRef result As Double) As Boolean
+        Friend Shared Function TryParse(ByVal value As String, ByRef result As Double) As Boolean
             'Grasshopper still does not support Double.TryParse
 #If TARGET_JVM = False Then
             Return Double.TryParse(value, result)
