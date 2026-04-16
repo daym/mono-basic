@@ -10,6 +10,7 @@ clean-local:
 
 
 DISTFILES = \
+	bootstrap-bmcs.sh		\
 	config-default.make		\
 	executable.make			\
 	library.make			\

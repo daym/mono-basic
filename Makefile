@@ -9,6 +9,10 @@ include build/rules.make
 
 all-recursive $(STD_TARGETS:=-recursive): platform-check profile-check
 
+.PHONY: bootstrap-bmcs
+bootstrap-bmcs:
+	$(SHELL) build/bootstrap-bmcs.sh
+
 .PHONY: all-local $(STD_TARGETS:=-local)
 all-local $(STD_TARGETS:=-local):
 	@:
@@ -56,4 +60,3 @@ distcheck: dist-tarball
 	cmp before.list distdist.list || exit 1 ; \
 	rm -f before.list after.list distdist.list ; \
 	rm -rf $(package) InstallTest
-
