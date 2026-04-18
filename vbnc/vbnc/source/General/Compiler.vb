@@ -352,6 +352,7 @@ Public Class Compiler
 
         Try
             theAss = New AssemblyDeclaration(Me)
+            theAss.Name = IO.Path.GetFileNameWithoutExtension(OutFileName)
             result = Parser.Parse(RootNamespace, theAss) AndAlso result
         Catch ex As TooManyErrorsException
             Throw
