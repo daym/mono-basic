@@ -1212,6 +1212,10 @@ Partial Public Class Emitter
                 EmitLoadDecimalValue(tmp, CDec(Value))
                 Return True
             Case TypeCode.Object
+                ' TODO: this object-target branch predates the Object overload's
+                ' static-type normalization. If it is still reachable for folded
+                ' constants, unify it with the Object path instead of emitting a
+                ' raw integer here.
                 EmitLoadI4Value(tmp, Value)
                 'EmitBox(Info, Info.Compiler.TypeCache.System_Int32)
                 Return True
@@ -1377,6 +1381,24 @@ Partial Public Class Emitter
         Dim ActualTypeCode As TypeCode = Helper.GetTypeCode(Info.Compiler, ActualType)
         Dim DesiredType As Mono.Cecil.TypeReference = Info.DesiredType
         Dim DesiredTypeCode As TypeCode = Helper.GetTypeCode(Info.Compiler, DesiredType)
+
+        ' Folded constants are stored as Object, but emission has to follow the
+        ' expression's static type. Normalize the runtime value to the desired
+        ' type first so later boxing/conversion code sees a consistent value/type
+        ' pair.
+        ' TODO: generic desired types still bypass this normalization path.
+        ' If folded constants ever flow here for generic targets, either teach
+        ' TypeConverter about them or split constant emission by static type.
+        If DesiredTypeCode <> TypeCode.Object AndAlso DesiredTypeCode <> ActualTypeCode AndAlso CecilHelper.IsGenericParameter(DesiredType) = False Then
+            Dim converted As Object = Nothing
+
+            If TypeConverter.ConvertTo(Info.Context, Value, DesiredType, converted, False) Then
+                Value = converted
+                If Value Is Nothing Then Value = DBNull.Value
+                ActualType = CecilHelper.GetType(Info.Compiler, Value)
+                ActualTypeCode = Helper.GetTypeCode(Info.Compiler, ActualType)
+            End If
+        End If
 
 #If EXTENDEDDEBUG Then
         Info.Compiler.Report.WriteLine(String.Format("Emitter.EmitLoadValue (EmitInfo, Object): ActualType={0}, DesiredType={1}, Value={2}", ActualTypeCode, DesiredTypeCode, Value))
