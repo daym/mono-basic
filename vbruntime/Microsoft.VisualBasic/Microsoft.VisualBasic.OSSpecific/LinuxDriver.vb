@@ -105,7 +105,7 @@ Namespace Microsoft.VisualBasic.OSSpecific
             Return New StreamWriter(stream, new UTF8Encoding())
         End Function
 
-        Private Function CreateUniqueUtf8File(ByVal directory As String, ByVal filename As String,
+        Private Function CreateUniqueUtf8File(ByVal directory As String, ByVal filename As String, _
                 ByVal extension As String, ByVal hashcode as Integer, ByRef outfilename As String) As StreamWriter
             Dim result As StreamWriter
 
@@ -153,7 +153,7 @@ Namespace Microsoft.VisualBasic.OSSpecific
                 infoFile.Flush
                 ' Move item to trash
                 Dim trashFileName As String
-                trashFileName = Path.Combine(XdgTrash, "files", Path.GetFileNameWithoutExtension(Path.GetFileName(infoFileName)))
+                trashFileName = Path.Combine(Path.Combine(XdgTrash, "files"), Path.GetFileNameWithoutExtension(Path.GetFileName(infoFileName)))
                 If Directory.Exists (pathname) Then
                     Directory.Move (pathname, trashFileName)
                 Else
@@ -162,7 +162,7 @@ Namespace Microsoft.VisualBasic.OSSpecific
                 succeeded = True
             Finally
                 infoFile.Dispose
-                If Not succeeded
+                If Not succeeded Then
                     File.Delete (infoFileName)
                 End If
             End Try
