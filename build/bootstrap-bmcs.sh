@@ -145,16 +145,36 @@ Imports System.Diagnostics'
                 -e 's/AssemblyVersion("8\.0\.0\.0")/AssemblyVersion("8.0.0.1")/' \
                 "$out"
         fi
+        # Strings.AscW(Char) in the upstream source relies on vbnc-specific
+        # intrinsic lowering when the runtime is compiled without a VB runtime
+        # reference. Under the VB 10 conversion rules, CInt(Char) is not a
+        # defined conversion, so bmcs is correct not to special-case it. Patch
+        # the bootstrap copy to the explicit UInt16 conversion that preserves
+        # AscW's Unicode semantics without depending on that compiler quirk.
+        if [ "$flat" = "Microsoft.VisualBasic_Strings.vb" ]; then
+            sed -i \
+                -e 's/Return AscW(\[String\])/Return Convert.ToUInt16([String])/' \
+                "$out"
+        fi
+        # Wine's trash support adds LinuxDriver/Win32Driver implementations
+        # that old bmcs cannot bootstrap cleanly. Keep the real source intact,
+        # but make the bootstrap copy throw before referencing the excluded
+        # platform drivers.
+        if [ "$flat" = "Microsoft.VisualBasic.OSSpecific_OSDriver.vb" ]; then
+            sed -i \
+                -e 's/m_Driver = New LinuxDriver()/Throw New PlatformNotSupportedException("Linux OSDriver is excluded from this bootstrap build.")/' \
+                "$out"
+        fi
         # This is intentionally a reduced bootstrap runtime, matching the
-        # existing external build-vbnc.sh path that bmcs already proved it can
-        # compile.  These files stay out of the bootstrap DLL because they hit
+        # existing external build-vbnc.sh path where possible. The remaining
+        # exclusions stay out of the bootstrap DLL because they still hit
         # known bmcs parse/semantic failures in this older toolchain.
         case "$flat" in
             *WindowsFormsApplication*|\
             *ComputerInfo*|\
+            *LinuxDriver.vb|\
             *Win32Driver.vb|\
             *Collection.vb|\
-            *_Interaction.vb|\
             *ServerComputer*|\
             *_Computer.vb|\
             *ApplicationServices_AssemblyInfo*|\
